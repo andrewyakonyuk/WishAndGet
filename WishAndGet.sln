@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31825.309
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WishAndGet.WebApp", "WishAndGet.WebApp\WishAndGet.WebApp.csproj", "{89296C3C-9C40-4926-A3EF-A1F9346D4CD2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WishAndGet", "WishAndGet\WishAndGet.csproj", "{AE345D6F-7D21-4BB6-93E2-4F458F60BF40}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D1949B20-C5EF-4C9A-BD24-8060EC1962F9}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{89296C3C-9C40-4926-A3EF-A1F9346D4CD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89296C3C-9C40-4926-A3EF-A1F9346D4CD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89296C3C-9C40-4926-A3EF-A1F9346D4CD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89296C3C-9C40-4926-A3EF-A1F9346D4CD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE345D6F-7D21-4BB6-93E2-4F458F60BF40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE345D6F-7D21-4BB6-93E2-4F458F60BF40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE345D6F-7D21-4BB6-93E2-4F458F60BF40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE345D6F-7D21-4BB6-93E2-4F458F60BF40}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FBAF57AB-8A55-4574-8CE8-17E88DD2A171}
+	EndGlobalSection
+EndGlobal
