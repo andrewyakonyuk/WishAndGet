@@ -31,7 +31,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WishAndGet\WishAndGet.csproj" />
-    <ProjectReference Include="..\Wishlistr\WishAndGet.csproj" />
   </ItemGroup>
 
   <ItemGroup>

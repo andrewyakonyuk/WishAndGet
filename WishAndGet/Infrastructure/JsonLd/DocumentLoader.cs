@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace WishAndGet.Infrastructure.JsonLd
 {
@@ -88,7 +89,7 @@ namespace WishAndGet.Infrastructure.JsonLd
                     Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
                     doc.DocumentUrl = finalUrl;
-                    doc.Document = JToken.ReadFrom(new JsonTextReader(new StreamReader(stream)));
+                    doc.Document = JToken.ReadFrom(new JsonTextReader(new StreamReader(stream, Encoding.Unicode)));
                 }
             }
             catch (JsonLdError)
