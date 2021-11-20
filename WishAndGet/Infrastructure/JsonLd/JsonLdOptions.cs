@@ -174,7 +174,8 @@ namespace WishAndGet.Infrastructure.JsonLd
 
         public string outputForm = null;
 
-        public DocumentLoader documentLoader = new DocumentLoader();
+        public IJsonLdDocumentLoader DocumentLoader { get; init; }
+
         // TODO: THE FOLLOWING ONLY EXIST SO I DON'T HAVE TO DELETE A LOT OF CODE,
         // REMOVE IT WHEN DONE
     }

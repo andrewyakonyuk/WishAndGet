@@ -1096,7 +1096,7 @@ namespace WishAndGet.Infrastructure.JsonLd
             // for convenience
             IDictionary<string, JToken> elem = (IDictionary<string, JToken>)element;
             // 2)
-            if (!((IDictionary<string,JToken>)nodeMap).ContainsKey(activeGraph))
+            if (!nodeMap.ContainsKey(activeGraph))
             {
                 nodeMap[activeGraph] = new JObject();
             }

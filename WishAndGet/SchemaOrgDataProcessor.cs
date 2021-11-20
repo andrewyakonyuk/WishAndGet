@@ -11,11 +11,18 @@ namespace WishAndGet
 {
     public class SchemaOrgDataProcessor
     {
+        private readonly IJsonLdDocumentLoader documentLoader;
+
+        public SchemaOrgDataProcessor(IJsonLdDocumentLoader documentLoader)
+        {
+            this.documentLoader = documentLoader ?? throw new ArgumentNullException(nameof(documentLoader));
+        }
+
         public IReadOnlyCollection<JObject> Flatten(string rawSchemaData)
         {
             var options = new JsonLdOptions
             {
-                documentLoader = new CachedDocumentLoader(new SchemaDocumentLoader())
+                DocumentLoader = new CachedDocumentLoader(new SchemaDocumentLoader(documentLoader))
             };
             var remoteContext = JObject.Parse("{'@context':'https://schema.org/'}");
             var jsonData = JObject.Parse(rawSchemaData);
@@ -24,36 +31,42 @@ namespace WishAndGet
             return flattened["@graph"].ToObject<List<JObject>>();
         }
 
-        public class SchemaDocumentLoader : DocumentLoader
+        public class SchemaDocumentLoader : IJsonLdDocumentLoader
         {
             readonly static Uri schemaOrgUri = new("https://schema.org", UriKind.Absolute);
+            readonly IJsonLdDocumentLoader documentLoader;
 
-            public override async Task<RemoteDocument> LoadDocumentAsync(string url)
+            public SchemaDocumentLoader(IJsonLdDocumentLoader documentLoader)
+            {
+                this.documentLoader = documentLoader ?? throw new ArgumentNullException(nameof(documentLoader));
+            }
+
+            public Task<RemoteDocument> LoadDocumentAsync(string url, CancellationToken token = default)
             {
                 var uri = new Uri(url);
                 if (uri.Host == schemaOrgUri.Host)
                     url = "https://schema.org/docs/jsonldcontext.json";
 
-                return await base.LoadDocumentAsync(url).ConfigureAwait(false);
+                return documentLoader.LoadDocumentAsync(url, token);
             }
         }
 
-        public class CachedDocumentLoader : DocumentLoader
+        public class CachedDocumentLoader : IJsonLdDocumentLoader
         {
-            readonly DocumentLoader loader;
+            readonly IJsonLdDocumentLoader loader;
             readonly ConcurrentDictionary<string, RemoteDocument> cache = new();
 
-            public CachedDocumentLoader(DocumentLoader loader)
+            public CachedDocumentLoader(IJsonLdDocumentLoader loader)
             {
                 this.loader = loader ?? throw new ArgumentNullException(nameof(loader));
             }
 
-            public override async Task<RemoteDocument> LoadDocumentAsync(string url)
+            public async Task<RemoteDocument> LoadDocumentAsync(string url, CancellationToken token = default)
             {
                 if (cache.TryGetValue(url, out RemoteDocument result))
                     return result;
 
-                var document = await loader.LoadDocumentAsync(url).ConfigureAwait(false);
+                var document = await loader.LoadDocumentAsync(url, token).ConfigureAwait(false);
                 cache.TryAdd(url, document);
 
                 return document;

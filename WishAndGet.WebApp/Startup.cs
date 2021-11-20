@@ -1,11 +1,9 @@
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WishAndGet.Infrastructure.JsonLd;
 
 namespace WishAndGet.WebApp
 {
@@ -32,7 +30,9 @@ namespace WishAndGet.WebApp
 
             services.AddSingleton<BrowserAccessor>();
             services.AddSingleton<PageSchemaOrgGrabber>();
-            services.AddSingleton<SchemaOrgDataProcessor>();
+            services.AddTransient<SchemaOrgDataProcessor>();
+
+            services.AddJsonLd();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

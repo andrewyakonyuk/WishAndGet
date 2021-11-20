@@ -114,7 +114,7 @@ namespace WishAndGet.Infrastructure.JsonLd
 				}
 			}
 			// 7)
-			if (numberMembers == 1 && (!(valueValue.Type == JTokenType.String) || !((IDictionary<string,JToken>)this).ContainsKey("@language"
+			if (numberMembers == 1 && (!(valueValue.Type == JTokenType.String) || !this.ContainsKey("@language"
 				) || (GetTermDefinition(activeProperty).ContainsKey("@language") && languageMapping
 				 == null)))
 			{
@@ -182,7 +182,7 @@ namespace WishAndGet.Infrastructure.JsonLd
                             RemoteDocument rd;
                             try
                             {
-                                rd = options.documentLoader.LoadDocument(uri);
+                                rd = options.DocumentLoader.LoadDocument(uri);
                             }
                             catch (JsonLdError err)
                             {

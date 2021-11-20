@@ -73,7 +73,7 @@ namespace WishAndGet.Infrastructure.JsonLd
                         }
                         foreach (string key in m1.GetKeys())
                         {
-                            if (!((IDictionary<string,JToken>)m2).ContainsKey(key) ||
+                            if (!m2.ContainsKey(key) ||
                                 !DeepCompare(m1[key], m2[key], listOrderMatters))
                             {
                                 return false;
@@ -871,95 +871,6 @@ namespace WishAndGet.Infrastructure.JsonLd
                 }
             }
             return false;
-        }
-
-        /// <summary>Resolves external @context URLs using the given URL resolver.</summary>
-        /// <remarks>
-        /// Resolves external @context URLs using the given URL resolver. Each
-        /// instance of @context in the input that refers to a URL will be replaced
-        /// with the JSON @context found at that URL.
-        /// </remarks>
-        /// <param name="input">the JSON-LD input with possible contexts.</param>
-        /// <param name="resolver">(url, callback(err, jsonCtx)) the URL resolver to use.</param>
-        /// <param name="callback">(err, input) called once the operation completes.</param>
-        /// <exception cref="JsonLdError">JsonLdError</exception>
-        /// <exception cref="JsonLdError"></exception>
-        internal static void ResolveContextUrls(JToken input)
-        {
-            Resolve(input, new JObject());
-        }
-
-        /// <exception cref="JsonLdError"></exception>
-        private static void Resolve(JToken input, JObject cycles)
-        {
-            Pattern regex = Pattern.Compile("(http|https)://(\\w+:{0,1}\\w*@)?(\\S+)(:[0-9]+)?(/|/([\\w#!:.?+=&%@!\\-/]))?"
-                );
-            if (cycles.Count > MaxContextUrls)
-            {
-                throw new JsonLdError(JsonLdError.Error.UnknownError);
-            }
-            // for tracking the URLs to resolve
-            JObject urls = new JObject();
-            // find all URLs in the given input
-            if (!FindContextUrls(input, urls, false))
-            {
-                // finished
-                FindContextUrls(input, urls, true);
-            }
-            // queue all unresolved URLs
-            JArray queue = new JArray();
-            foreach (string url in urls.GetKeys())
-            {
-                if (urls[url].SafeCompare(false))
-                {
-                    // validate URL
-                    if (!regex.Matcher(url).Matches())
-                    {
-                        throw new JsonLdError(JsonLdError.Error.UnknownError);
-                    }
-                    queue.Add(url);
-                }
-            }
-            // resolve URLs in queue
-            int count = queue.Count;
-            foreach (string url_1 in queue)
-            {
-                // check for context URL cycle
-                if (cycles.ContainsKey(url_1))
-                {
-                    throw new JsonLdError(JsonLdError.Error.UnknownError);
-                }
-                JObject _cycles = (JObject)Clone(cycles);
-                _cycles[url_1] = true;
-                try
-                {
-                    JObject ctx = (JObject)new DocumentLoader().LoadDocument(url_1).Document;
-                    if (!ctx.ContainsKey("@context"))
-                    {
-                        ctx = new JObject();
-                        ctx["@context"] = new JObject();
-                    }
-                    Resolve(ctx, _cycles);
-                    urls[url_1] = ctx["@context"];
-                    count -= 1;
-                    if (count == 0)
-                    {
-                        FindContextUrls(input, urls, true);
-                    }
-                }
-                //catch (JsonParseException)
-                //{
-                //    throw new JsonLdError(JsonLdError.Error.UnknownError);
-                //}
-                //catch (MalformedURLException)
-                //{
-                //    throw new JsonLdError(JsonLdError.Error.UnknownError);
-                //}
-                catch (IOException)
-                {
-                    throw new JsonLdError(JsonLdError.Error.UnknownError);
-                }
-            }
         }
 
         /// <summary>Finds all @context URLs in the given JSON-LD input.</summary>

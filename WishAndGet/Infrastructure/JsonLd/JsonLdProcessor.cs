@@ -36,7 +36,7 @@ namespace WishAndGet.Infrastructure.JsonLd
             {
                 try
                 {
-                    RemoteDocument tmp = opts.documentLoader.LoadDocument((string)input);
+                    RemoteDocument tmp = opts.DocumentLoader.LoadDocument((string)input);
                     input = tmp.Document;
                 }
                 catch (Exception e)
@@ -54,28 +54,28 @@ namespace WishAndGet.Infrastructure.JsonLd
                 }
             }
             // 3)
-            Context activeCtx = new Context(opts);
+            Context activeContext = new(opts);
             // 4)
             if (opts.GetExpandContext() != null)
             {
                 JObject exCtx = opts.GetExpandContext();
-                if (exCtx is JObject && ((IDictionary<string, JToken>)exCtx).ContainsKey("@context"
+                if (exCtx is JObject && exCtx.ContainsKey("@context"
                     ))
                 {
-                    exCtx = (JObject)((IDictionary<string, JToken>)exCtx)["@context"];
+                    exCtx = (JObject)exCtx["@context"];
                 }
-                activeCtx = activeCtx.Parse(exCtx);
+                activeContext = activeContext.Parse(exCtx);
             }
             // 5)
             // TODO: add support for getting a context from HTTP when content-type
             // is set to a jsonld compatable format
             // 6)
-            JToken expanded = new JsonLdApi(opts).Expand(activeCtx, input);
+            JToken expanded = new JsonLdApi(opts).Expand(activeContext, input);
             // final step of Expansion Algorithm
-            if (expanded is JObject && ((IDictionary<string,JToken>)expanded).ContainsKey("@graph") && (
+            if (expanded is JObject @object && ((IDictionary<string,JToken>)expanded).ContainsKey("@graph") && (
                 (IDictionary<string, JToken>)expanded).Count == 1)
             {
-                expanded = ((JObject)expanded)["@graph"];
+                expanded = @object["@graph"];
             }
             else
             {
@@ -87,7 +87,7 @@ namespace WishAndGet.Infrastructure.JsonLd
             // normalize to an array
             if (!(expanded is JArray))
             {
-                JArray tmp = new JArray();
+                JArray tmp = new();
                 tmp.Add(expanded);
                 expanded = tmp;
             }
@@ -113,7 +113,7 @@ namespace WishAndGet.Infrastructure.JsonLd
             // 9) NOTE: the next block is the Flattening Algorithm described in
             // http://json-ld.org/spec/latest/json-ld-api/#flattening-algorithm
             // 1)
-            JObject nodeMap = new JObject();
+            JObject nodeMap = new();
             nodeMap["@default"] = new JObject();
             // 2)
             new JsonLdApi(opts).GenerateNodeMap(expanded, nodeMap);
@@ -143,7 +143,7 @@ namespace WishAndGet.Infrastructure.JsonLd
                 {
                     entry["@graph"] = new JArray();
                 }
-                JArray keys = new JArray(graph.GetKeys());
+                JArray keys = new(graph.GetKeys());
                 keys.SortInPlace();
                 foreach (string id in keys)
                 {
@@ -155,9 +155,9 @@ namespace WishAndGet.Infrastructure.JsonLd
                 }
             }
             // 5)
-            JArray flattened = new JArray();
+            JArray flattened = new();
             // 6)
-            JArray keys_1 = new JArray(defaultGraph.GetKeys());
+            JArray keys_1 = new(defaultGraph.GetKeys());
             keys_1.SortInPlace();
             foreach (string id_1 in keys_1)
             {
@@ -171,19 +171,21 @@ namespace WishAndGet.Infrastructure.JsonLd
             // 8)
             if (!context.IsNull() && !flattened.IsEmpty())
             {
-                Context activeCtx = new Context(opts);
+                Context activeCtx = new(opts);
                 activeCtx = activeCtx.Parse(context);
                 // TODO: only instantiate one jsonldapi
                 JToken compacted = new JsonLdApi(opts).Compact(activeCtx, null, flattened, opts.GetCompactArrays
                     ());
-                if (!(compacted is JArray))
+                if (compacted is not JArray)
                 {
-                    JArray tmp = new JArray();
-                    tmp.Add(compacted);
+                    JArray tmp = new()
+                    {
+                        compacted
+                    };
                     compacted = tmp;
                 }
                 string alias = activeCtx.CompactIri("@graph");
-                JObject rval = activeCtx.Serialize();
+                JObject rval = new();
                 rval[alias] = compacted;
                 return rval;
             }
