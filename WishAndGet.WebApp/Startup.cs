@@ -28,7 +28,7 @@ namespace WishAndGet.WebApp
                 configuration.RootPath = "ClientApp/build";
             });
 
-            services.AddSingleton<BrowserAccessor>();
+            services.AddSingleton<BrowserContextAccessor>();
             services.AddSingleton<PageSchemaOrgGrabber>();
             services.AddTransient<SchemaOrgDataProcessor>();
 
