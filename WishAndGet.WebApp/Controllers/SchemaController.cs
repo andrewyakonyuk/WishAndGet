@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WishAndGet.Infrastructure.JsonLd;
 
 namespace WishAndGet.WebApp.Controllers
 {
@@ -12,30 +13,22 @@ namespace WishAndGet.WebApp.Controllers
     [Route("[controller]")]
     public class SchemaController : ControllerBase
     {
-        private readonly PageSchemaOrgGrabber grabber;
-        private readonly SchemaOrgDataProcessor schemaOrgDataProcessor;
+        private readonly SchemaDataGrabber schemaGrabber;
+        private readonly SchemaDataProcessor schemaProcessor;
 
         public SchemaController(
-            PageSchemaOrgGrabber grabber,
-            SchemaOrgDataProcessor schemaOrgDataProcessor)
+            SchemaDataGrabber schemaGrabber,
+            SchemaDataProcessor schemaProcessor)
         {
-            this.grabber = grabber;
-            this.schemaOrgDataProcessor = schemaOrgDataProcessor;
+            this.schemaGrabber = schemaGrabber;
+            this.schemaProcessor = schemaProcessor;
         }
 
         [HttpPost("[action]")]
         public async Task<IEnumerable<JObject>> Grab([FromForm] string url, CancellationToken token = default)
         {
-            var schemaRawData = await grabber.GrabAsync(url, token);
-
-            var schemaObjectsMap = new Dictionary<string, JObject>(StringComparer.OrdinalIgnoreCase);
-            foreach (var schemaObject in schemaRawData
-                .SelectMany(data => schemaOrgDataProcessor.Flatten(data)))
-            {
-                var idValue = (string)schemaObject["id"];
-                if (!string.IsNullOrEmpty(idValue))
-                    schemaObjectsMap[idValue] = schemaObject;
-            }
+            var schemaRawData = await schemaGrabber.GrabRawAsync(url, token);
+            var schemaObjectsMap = CreateSchemaObjectsMap(schemaRawData);
 
             var result = new HashSet<JObject>();
             foreach (var product in schemaObjectsMap.Values.Where(p => IsSchemaType((string)p["type"], "Product")))
@@ -45,6 +38,20 @@ namespace WishAndGet.WebApp.Controllers
             }
 
             return result.ToList();
+        }
+
+        private Dictionary<string, JObject> CreateSchemaObjectsMap(List<string> schemaRawData)
+        {
+            var schemaObjectsMap = new Dictionary<string, JObject>(StringComparer.OrdinalIgnoreCase);
+            foreach (var schemaObject in schemaRawData
+                .SelectMany(data => schemaProcessor.Flatten(data)))
+            {
+                var idValue = (string)schemaObject["id"];
+                if (!string.IsNullOrEmpty(idValue))
+                    schemaObjectsMap[idValue] = schemaObject;
+            }
+
+            return schemaObjectsMap;
         }
 
         bool IsSchemaType(string value, string type)

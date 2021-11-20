@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace WishAndGet
+namespace WishAndGet.Infrastructure.JsonLd
 {
     public class JsonLdObjectVisitor
     {

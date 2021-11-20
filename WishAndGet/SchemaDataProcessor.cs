@@ -9,11 +9,11 @@ using WishAndGet.Infrastructure.JsonLd;
 
 namespace WishAndGet
 {
-    public class SchemaOrgDataProcessor
+    public class SchemaDataProcessor
     {
         private readonly IJsonLdDocumentLoader documentLoader;
 
-        public SchemaOrgDataProcessor(IJsonLdDocumentLoader documentLoader)
+        public SchemaDataProcessor(IJsonLdDocumentLoader documentLoader)
         {
             this.documentLoader = documentLoader ?? throw new ArgumentNullException(nameof(documentLoader));
         }

@@ -29,8 +29,8 @@ namespace WishAndGet.WebApp
             });
 
             services.AddSingleton<BrowserContextAccessor>();
-            services.AddSingleton<PageSchemaOrgGrabber>();
-            services.AddTransient<SchemaOrgDataProcessor>();
+            services.AddSingleton<SchemaDataGrabber>();
+            services.AddTransient<SchemaDataProcessor>();
 
             services.AddJsonLd();
         }

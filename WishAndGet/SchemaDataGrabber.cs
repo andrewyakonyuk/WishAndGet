@@ -1,17 +1,17 @@
 ﻿namespace WishAndGet
 {
-    public class PageSchemaOrgGrabber
+    public class SchemaDataGrabber
     {
         private readonly BrowserContextAccessor browserAccessor;
         private readonly Lazy<string> grabScriptFile = new(ReadGrabScriptFile, true);
         const string UserAgent = "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/W.X.Y.Z Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
 
-        public PageSchemaOrgGrabber(BrowserContextAccessor browserAccessor)
+        public SchemaDataGrabber(BrowserContextAccessor browserAccessor)
         {
             this.browserAccessor = browserAccessor;
         }
 
-        public async Task<List<string>> GrabAsync(string url, CancellationToken cancellationToken = default)
+        public async Task<List<string>> GrabRawAsync(string url, CancellationToken cancellationToken = default)
         {
             var browserContext = await browserAccessor.GetBrowserContextAsync();
 
