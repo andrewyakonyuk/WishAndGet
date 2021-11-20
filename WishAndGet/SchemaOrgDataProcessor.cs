@@ -35,19 +35,32 @@ namespace WishAndGet
         {
             readonly static Uri schemaOrgUri = new("https://schema.org", UriKind.Absolute);
             readonly IJsonLdDocumentLoader documentLoader;
+            readonly Lazy<RemoteDocument> schemaOrgDocument = new(ReadSchemaOrgDocument, true);
 
             public SchemaDocumentLoader(IJsonLdDocumentLoader documentLoader)
             {
                 this.documentLoader = documentLoader ?? throw new ArgumentNullException(nameof(documentLoader));
             }
 
-            public Task<RemoteDocument> LoadDocumentAsync(string url, CancellationToken token = default)
+            public async Task<RemoteDocument> LoadDocumentAsync(string url, CancellationToken token = default)
             {
                 var uri = new Uri(url);
                 if (uri.Host == schemaOrgUri.Host)
-                    url = "https://schema.org/docs/jsonldcontext.json";
+                    return schemaOrgDocument.Value;
 
-                return documentLoader.LoadDocumentAsync(url, token);
+                return await documentLoader.LoadDocumentAsync(url, token);
+            }
+
+            static RemoteDocument ReadSchemaOrgDocument()
+            {
+                var currentDir = Environment.CurrentDirectory;
+                var content = File.ReadAllText(Path.Combine(currentDir, "assets", "jsonld", "schema.org", "jsonldcontext.json"));
+
+                return new RemoteDocument
+                {
+                    DocumentUrl = "https://schema.org/docs/jsonldcontext.json",
+                    Document = JToken.Parse(content),
+                };
             }
         }
 

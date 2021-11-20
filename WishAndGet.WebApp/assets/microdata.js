@@ -85,7 +85,7 @@
         return result;
       },
       scopes: function (nodes) {
-        if (!nodes) nodes = doc.querySelectorAll('[itemscope]:not([itemprop])');
+        if (!nodes) nodes = doc.querySelectorAll('[itemscope]');
         const scopes = [];
         for (var i = 0; i < nodes.length; i++) {
           var scope = nodes[i];
